@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\UpdateController;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Route;
 
@@ -28,5 +29,7 @@ Route::post('/login', LoginController::class);
 
 Route::group(['middleware' => 'auth'], function () {
     Route::view('index','index')->name('index');
+    Route::patch('/index', UpdateController::class)->name('update');
     Route::post('/logout', [LoginController::class,'logout'])->name('logout');
 });
+
