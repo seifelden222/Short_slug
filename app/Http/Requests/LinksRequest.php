@@ -21,8 +21,15 @@ class LinksRequest extends FormRequest
      */
     public function rules(): array
     {
+        $linkId = $this->route('link'); // For update requests
+
         return [
-            'slug' => 'nullable|string|regex:/^[a-z0-9-]{4,30}$/|unique:links,slug',
+            'slug' => [
+                'nullable',
+                'string',
+                'regex:/^[a-z0-9-]{4,30}$/',
+                'unique:links,slug' . ($linkId ? ",$linkId" : '')
+            ],
             'target_url' => 'required|url|max:2048',
             'is_active' => 'boolean',
             'expires_at' => 'nullable|date|after:now',

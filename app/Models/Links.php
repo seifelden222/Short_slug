@@ -28,6 +28,10 @@ class Links extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function clicks()
+    {
+        return $this->hasMany(Click::class);
+    }
 
     public function scopeSearch(Builder $q, ?string $s): Builder
     {

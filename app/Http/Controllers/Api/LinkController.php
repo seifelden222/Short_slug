@@ -16,17 +16,33 @@ class LinkController extends Controller
      */
     public function index(Request $request)
     {
-
         // $this->authorize('viewAny', Links::class);
         try {
-            $links = Links::query()
+            $query = Links::query()
                 ->search($request->query('q'))
-                ->active($request->query('is_active'))
-                ->expired($request->query('is_expired'))
-                // ->sort($request->query('sort'))
-                ->userId(auth()->id())
-                ->paginate(min(max($request->query('per_page', 10), 1), 100))
+                ->active($request->query('active'))
+                ->expired($request->query('expired'))
+                ->userId(auth()->id()); // Use authenticated user
+
+            // Add sorting
+            $sort = $request->query('sort', '-created_at');
+            if ($sort) {
+                $direction = 'asc';
+                $field = $sort;
+
+                if (str_starts_with($sort, '-')) {
+                    $direction = 'desc';
+                    $field = substr($sort, 1);
+                }
+
+                if (in_array($field, ['created_at', 'clicks_count', 'slug'])) {
+                    $query->orderBy($field, $direction);
+                }
+            }
+
+            $links = $query->paginate(min(max($request->query('per_page', 10), 1), 100))
                 ->appends($request->query());
+
             return LinksResource::collection($links);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to retrieve links', 'message' => $e->getMessage()], 500);
@@ -39,9 +55,15 @@ class LinkController extends Controller
     {
         // $this->authorize('create', Links::class);
 
-        try { 
+        try {
             $validated = $my->validated();
-            $link = Links::create($validated + ['user_id' => 1]); //->id() مؤقتاً لتجربة
+
+            // Generate slug if not provided
+            if (empty($validated['slug'])) {
+                $validated['slug'] = $this->generateUniqueSlug();
+            }
+
+            $link = Links::create($validated + ['user_id' => auth()->id()]); // Use authenticated user
             return new LinksResource($link);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to create link', 'message' => $e->getMessage()], 500);
@@ -100,5 +122,14 @@ class LinkController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete link', 'message' => $e->getMessage()], 500);
         }
+    }
+
+    private function generateUniqueSlug($length = 6)
+    {
+        do {
+            $slug = strtolower(bin2hex(random_bytes($length / 2)));
+        } while (Links::where('slug', $slug)->exists());
+
+        return $slug;
     }
 }

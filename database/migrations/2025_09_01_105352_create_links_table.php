@@ -21,7 +21,6 @@ return new class extends Migration
             $table->unsignedBigInteger('clicks_count')->default(0); // denormalized
             $table->softDeletes();
             $table->timestamps();
-
             $table->index(['user_id', 'is_active']);
             $table->index('expires_at');
             $table->index('created_at');
