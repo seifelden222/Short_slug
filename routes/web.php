@@ -29,7 +29,9 @@ Route::post('/login', LoginController::class);
 
 Route::group(['middleware' => 'auth'], function () {
     Route::view('index','index')->name('index');
-    Route::patch('/index', UpdateController::class)->name('update');
+    Route::patch('/index', [UpdateController::class,'update'])->name('update');
+    Route::view('/reset_password','auth.reset_password')->name('reset_password.view');
+    Route::post('/reset_password', [UpdateController::class,'reset_password'])->name('reset_password');
     Route::post('/logout', [LoginController::class,'logout'])->name('logout');
 });
 
