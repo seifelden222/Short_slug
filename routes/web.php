@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\UpdateController;
+use App\Http\Controllers\auth\LoginController;
+use App\Http\Controllers\auth\RegisterController;
+use App\Http\Controllers\auth\UpdateController;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Route;
 

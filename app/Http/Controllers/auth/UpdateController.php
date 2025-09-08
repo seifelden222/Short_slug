@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\auth;
 
-use App\Http\Requests\Reset_passwordRequest;
-use App\Http\Requests\UpdateRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\auth\Reset_passwordRequest;
+use App\Http\Requests\auth\UpdateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

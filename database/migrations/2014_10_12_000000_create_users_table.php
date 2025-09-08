@@ -2,13 +2,16 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Schema;
+use Laravel\Sanctum\HasApiTokens;
 
 return new class extends Migration
 {
     /**
      * Run the migrations.
      */
+    use HasApiTokens,Notifiable;
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {

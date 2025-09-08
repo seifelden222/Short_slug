@@ -19,3 +19,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource('links', App\Http\Controllers\Api\LinkController::class);
+
+Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'register'])->name('register');
+Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login'])->name('login');
+
+Route::post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout'])->name('logout')->middleware('auth:sanctum');
