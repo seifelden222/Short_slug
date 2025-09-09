@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Links>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Link>
  */
-class LinksFactory extends Factory
+class LinkFactory extends Factory
 {
     /**
      * Define the model's default state.

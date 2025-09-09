@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-use App\Models\Links;
+use App\Models\Link;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-      Links::factory(10)->create();
+      Link::factory(10)->create();
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',

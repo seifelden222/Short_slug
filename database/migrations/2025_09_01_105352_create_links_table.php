@@ -18,10 +18,9 @@ return new class extends Migration
             $table->string('target_url', 2048);
             $table->boolean('is_active')->default(true);
             $table->timestamp('expires_at')->nullable();
-            $table->unsignedBigInteger('clicks_count')->default(0); // denormalized
+            $table->unsignedBigInteger('clicks_count')->default(0); // Added back the clicks_count column
             $table->softDeletes();
             $table->timestamps();
-
             $table->index(['user_id', 'is_active']);
             $table->index('expires_at');
             $table->index('created_at');

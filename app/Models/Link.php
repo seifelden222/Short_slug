@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Links extends Model
+class Link extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -27,6 +27,10 @@ class Links extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function clicks()
+    {
+        return $this->hasMany(Click::class);
     }
 
     public function scopeSearch(Builder $q, ?string $s): Builder
@@ -62,5 +66,21 @@ class Links extends Model
     public function scopeUserId(Builder $q, $userId): Builder
     {
         return blank($userId) ? $q : $q->where('user_id', $userId);
+    }
+
+    public function scopeSort(Builder $q, ?string $sort = 'created_at')
+    {
+        if (blank($sort)) return $q;
+        $direction = 'asc';
+
+        if (str_starts_with($sort, '-')) {
+            $sort = substr($sort, 1);
+            $direction = 'desc';
+        }
+        $allowedSorts = ['created_at', 'clicks_count', 'expires_at'];
+        if (in_array($sort, $allowedSorts)) {
+            return $q->orderBy($sort, $direction);
+        }
+        return $q->latest();
     }
 }

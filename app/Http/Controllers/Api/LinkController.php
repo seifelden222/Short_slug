@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LinksRequest;
 use App\Http\Resources\LinksResource;
-use App\Models\Links;
+use App\Models\Link;
 
 use Illuminate\Http\Request;
 
@@ -19,11 +19,11 @@ class LinkController extends Controller
 
         // $this->authorize('viewAny', Links::class);
         try {
-            $links = Links::query()
+            $links = Link::query()
                 ->search($request->query('q'))
                 ->active($request->query('is_active'))
                 ->expired($request->query('is_expired'))
-                // ->sort($request->query('sort'))
+                ->sort($request->query('sort'))
                 ->userId(auth()->id())
                 ->paginate(min(max($request->query('per_page', 10), 1), 100))
                 ->appends($request->query());
@@ -39,9 +39,9 @@ class LinkController extends Controller
     {
         // $this->authorize('create', Links::class);
 
-        try { 
+        try {
             $validated = $my->validated();
-            $link = Links::create($validated + ['user_id' => 1]); //->id() مؤقتاً لتجربة
+            $link = Link::create($validated + ['user_id']); //->id() مؤقتاً لتجربة
             return new LinksResource($link);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to create link', 'message' => $e->getMessage()], 500);
@@ -54,7 +54,7 @@ class LinkController extends Controller
     public function show(string $id)
     {
         try {
-            $link = Links::find($id);
+            $link = Link::find($id);
             if (!$link) {
                 return response()->json(['error' => 'Link not found'], 404);
             }
@@ -68,10 +68,10 @@ class LinkController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update( string $id, LinksRequest $my)
+    public function update(string $id, LinksRequest $my)
     {
         try {
-            $link = Links::find($id);
+            $link = Link::find($id);
             if (!$link) {
                 return response()->json(['error' => 'Link not found'], 404);
             }
@@ -90,7 +90,7 @@ class LinkController extends Controller
     public function destroy(string $id)
     {
         try {
-            $link = Links::find($id);
+            $link = Link::find($id);
             if (!$link) {
                 return response()->json(['error' => 'Link not found'], 404);
             }
