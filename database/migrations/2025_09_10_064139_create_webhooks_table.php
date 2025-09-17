@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Click;
-use App\Models\Links;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('clicks', function (Blueprint $table) {
+        Schema::create('webhooks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('link_id')->constrained()->cascadeOnDelete();
-            $table->string('ip', 45)->nullable();
-            $table->string('user_agent')->nullable();
-            $table->timestamp('occurred_at')->default(now());
-            $table->string('referrer')->nullable();
-            $table->string('idempotency_key')->nullable();
-            $table->unique(['link_id', 'idempotency_key']);
+            $table->json('payload');
+            $table->string('event'); // e.g. link.threshold.reached
+            $table->string('target_url'); // أين سنبعت
+            $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
+            $table->unsignedInteger('attempts')->default(0);
+            $table->text('last_error')->nullable();
             $table->timestamps();
         });
     }
@@ -31,9 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('clicks');
+        Schema::dropIfExists('webhooks');
     }
-
-   
-
 };

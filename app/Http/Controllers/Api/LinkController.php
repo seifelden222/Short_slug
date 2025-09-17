@@ -16,16 +16,20 @@ class LinkController extends Controller
      */
     public function index(Request $request)
     {
-
-        // $this->authorize('viewAny', Links::class);
         try {
-            $links = Link::query()
+            // Show user's own links or all links if admin
+            $query = Link::query()
                 ->search($request->query('q'))
                 ->active($request->query('is_active'))
                 ->expired($request->query('is_expired'))
-                ->sort($request->query('sort'))
-                ->userId(auth()->id())
-                ->paginate(min(max($request->query('per_page', 10), 1), 100))
+                ->sort($request->query('sort'));
+            
+            // Admin can see all links, regular users see only their own
+            if (!$this->isAdmin()) {
+                $query->userId(auth()->id());
+            }
+            
+            $links = $query->paginate(min(max($request->query('per_page', 10), 1), 100))
                 ->appends($request->query());
             return LinksResource::collection($links);
         } catch (\Exception $e) {
@@ -37,11 +41,10 @@ class LinkController extends Controller
      */
     public function store(LinksRequest $my)
     {
-        // $this->authorize('create', Links::class);
-
         try {
             $validated = $my->validated();
-            $link = Link::create($validated + ['user_id']); //->id() مؤقتاً لتجربة
+            $validated['user_id'] = auth()->id(); // Fix: Set current user ID
+            $link = Link::create($validated); 
             return new LinksResource($link);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to create link', 'message' => $e->getMessage()], 500);
@@ -58,7 +61,12 @@ class LinkController extends Controller
             if (!$link) {
                 return response()->json(['error' => 'Link not found'], 404);
             }
-            // $this->authorize('view', $link);
+            
+            // Check if user owns the link or is admin
+            if (!$this->canAccessLink($link)) {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
+            
             return new LinksResource($link);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to retrieve link', 'message' => $e->getMessage()], 500);
@@ -75,7 +83,12 @@ class LinkController extends Controller
             if (!$link) {
                 return response()->json(['error' => 'Link not found'], 404);
             }
-            // $this->authorize('update', $link);
+            
+            // Check if user owns the link or is admin
+            if (!$this->canAccessLink($link)) {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
+            
             $validated = $my->validated();
             $link->update($validated);
             return new LinksResource($link);
@@ -94,11 +107,32 @@ class LinkController extends Controller
             if (!$link) {
                 return response()->json(['error' => 'Link not found'], 404);
             }
-            // $this->authorize('delete', $link);
+            
+            // Check if user owns the link or is admin
+            if (!$this->canAccessLink($link)) {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
+            
             $link->delete();
             return response()->json(['message' => 'Link deleted successfully'], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete link', 'message' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Check if user is admin
+     */
+    private function isAdmin(): bool
+    {
+        return request()->header('X-Is-Admin') == '1' || env('IS_ADMIN') == true;
+    }
+
+    /**
+     * Check if user can access the link (owner or admin)
+     */
+    private function canAccessLink(Link $link): bool
+    {
+        return $this->isAdmin() || $link->user_id == auth()->id();
     }
 }
