@@ -69,7 +69,7 @@ class Webhook implements ShouldQueue
         }
 
         try {
-            $http = Http::timeout(5);
+            $http = Http::timeout(5)->retry(3, 100);
             if ($signature) {
                 $http = $http->withHeaders([
                     'X-Signature' => $signature,

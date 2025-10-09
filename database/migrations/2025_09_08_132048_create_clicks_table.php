@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('link_id')->constrained()->cascadeOnDelete();
             $table->string('ip', 45)->nullable();
+            $table->string('country')->nullable();
             $table->string('user_agent')->nullable();
             $table->timestamp('occurred_at')->default(now());
             $table->string('referrer')->nullable();
