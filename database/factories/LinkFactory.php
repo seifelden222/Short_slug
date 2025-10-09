@@ -19,13 +19,11 @@ class LinkFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id'      => User::factory(),                         // أو رقم ثابت لو عايز
-            'slug'         => $this->faker->boolean(20)
-                ? null
-                : Str::slug($this->faker->unique()->words(2, true)), // nullable|unique
-            'target_url'   => $this->faker->url(),
-            'is_active'    => $this->faker->boolean(90),
-            'expires_at'   => $this->faker->optional(0.3)->dateTimeBetween('now', '+30 days'),
+            'user_id' => User::factory(),
+            'slug' => $this->faker->unique()->lexify('????-????'), // Generate shorter slugs
+            'target_url' => $this->faker->url(),
+            'is_active' => true,
+            'expires_at' => $this->faker->optional(0.3)->dateTimeBetween('+1 day', '+1 year'),
             'clicks_count' => $this->faker->numberBetween(0, 500)
         ];
     }

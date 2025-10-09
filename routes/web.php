@@ -4,6 +4,7 @@ use App\Http\Controllers\auth\LoginController;
 use App\Http\Controllers\auth\RegisterController;
 use App\Http\Controllers\auth\UpdateController;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Route;
 
 /*

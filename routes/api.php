@@ -25,8 +25,12 @@ Route::post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout'
 
 
 
-Route::apiResource('links', App\Http\Controllers\Api\LinkController::class);
+Route::apiResource('links', App\Http\Controllers\Api\LinkController::class)->middleware('auth:sanctum');
 
 Route::post('/r/{slug}', [App\Http\Controllers\Api\ClickController::class, 'redirect']);
-Route::get('/links/{id}/stats', [App\Http\Controllers\Api\AnalyticsController::class, 'linkStats']);
-Route::get('/analytics/overview', [App\Http\Controllers\Api\AnalyticsController::class, 'overview']);
+Route::get('/links/{id}/stats', [App\Http\Controllers\Api\AnalyticsController::class, 'linkStats'])->middleware('auth:sanctum');
+Route::get('/analytics/overview', [App\Http\Controllers\Api\AnalyticsController::class, 'overview'])->middleware('auth:sanctum');
+
+// Webhook endpoints
+Route::get('/webhooks', [App\Http\Controllers\Api\WebhookController::class, 'index'])->middleware('auth:sanctum');
+Route::post('/webhooks/{id}/retry', [App\Http\Controllers\Api\WebhookController::class, 'retry'])->middleware('auth:sanctum');

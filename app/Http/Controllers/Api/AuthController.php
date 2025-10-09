@@ -35,7 +35,7 @@ class AuthController extends Controller
             $validated = $request->validated();
 
             if (Auth::attempt($validated)) {
-                // $request->session()->regenerate();
+              
                 $token = $request->user()->createToken('auth_token')->plainTextToken;
                 return response()->json([
                     'message' => 'Login successful.',

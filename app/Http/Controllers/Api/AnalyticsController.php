@@ -21,6 +21,11 @@ class AnalyticsController extends Controller
                 return response()->json(['error' => 'Link not found'], 404);
             }
 
+            // Check if user owns the link or is admin
+            if (!$this->canAccessLink($link)) {
+                return response()->json(['error' => 'Forbidden'], 403);
+            }
+
             $totalClicks = Click::where('link_id', $id)->count();
             $clicksByDay = Click::where('link_id', $id)
                 ->select(DB::raw('DATE(created_at) as date'), DB::raw(value: 'count(*) as clicks'))
@@ -82,5 +87,21 @@ class AnalyticsController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to retrieve analytics overview', 'message' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Check if user is admin
+     */
+    private function isAdmin(): bool
+    {
+        return request()->header('X-Is-Admin') == '1' || env('IS_ADMIN') == true;
+    }
+
+    /**
+     * Check if user can access the link (owner or admin)
+     */
+    private function canAccessLink(Link $link): bool
+    {
+        return $this->isAdmin() || $link->user_id == auth()->id();
     }
 }
